@@ -1,6 +1,7 @@
 package com.saman.ga.jssp.ga;
 
-import com.saman.ga.jssp.fitness.MakespanFitnessEvaluator;
+import com.saman.ga.jssp.constraints.MakespanObjective;
+import com.saman.ga.jssp.fitness.FitnessCalculator;
 import com.saman.ga.jssp.model.JsspInstance;
 import com.saman.ga.jssp.model.Schedule;
 
@@ -24,14 +25,14 @@ public final class GeneticAlgorithm {
     private final JsspInstance instance;
     private final GeneticAlgorithmConfig config;
     private final ScheduleDecoder decoder;
-    private final MakespanFitnessEvaluator fitnessEvaluator;
+    private final FitnessCalculator fitnessCalculator;
     private final Random random;
 
     public GeneticAlgorithm(JsspInstance instance, GeneticAlgorithmConfig config) {
         this.instance = Objects.requireNonNull(instance, "instance");
         this.config = Objects.requireNonNull(config, "config");
         this.decoder = new ScheduleDecoder();
-        this.fitnessEvaluator = new MakespanFitnessEvaluator(decoder);
+        this.fitnessCalculator = new FitnessCalculator(List.of(new MakespanObjective()));
         this.random = new Random(config.seed());
     }
 
@@ -88,7 +89,10 @@ public final class GeneticAlgorithm {
 
     private Individual evaluate(OperationBasedChromosome chromosome) {
         chromosome.validateFor(instance);
-        int fitness = fitnessEvaluator.evaluate(chromosome, instance);
+
+        Schedule schedule = decoder.decode(chromosome, instance);
+        int fitness = fitnessCalculator.calculate(schedule, instance);
+
         return new Individual(chromosome, fitness);
     }
 
