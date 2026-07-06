@@ -2,6 +2,7 @@ com\saman\ga\jssp\model\Machine.class
 com\saman\ga\jssp\constraints\MakespanObjective.class
 com\saman\ga\jssp\dynamic\DynamicConstraintInterpreter.class
 com\saman\ga\jssp\constraints\ConstraintEvaluation.class
+com\saman\ga\jssp\dynamic\DynamicConstraintDecisionExplainer.class
 com\saman\ga\jssp\constraints\ConstraintViolation.class
 com\saman\ga\jssp\constraints\ConstraintLevel.class
 com\saman\ga\jssp\cli\JsspGaCli.class

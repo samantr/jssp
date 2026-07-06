@@ -2,6 +2,7 @@ package com.saman.ga.jssp.cli;
 
 import com.saman.ga.jssp.constraints.ConstraintFunction;
 import com.saman.ga.jssp.dynamic.DynamicConstraint;
+import com.saman.ga.jssp.dynamic.DynamicConstraintDecisionExplainer;
 import com.saman.ga.jssp.dynamic.DynamicConstraintInterpreter;
 import com.saman.ga.jssp.dynamic.DynamicConstraintParser;
 import com.saman.ga.jssp.explanation.ConstraintExplanationReport;
@@ -138,6 +139,7 @@ public final class JsspGaCli {
 
         DynamicConstraintParser parser = new DynamicConstraintParser();
         DynamicConstraintInterpreter interpreter = new DynamicConstraintInterpreter();
+        DynamicConstraintDecisionExplainer decisionExplainer = new DynamicConstraintDecisionExplainer();
 
         try {
             DynamicConstraint dynamicConstraint = parser.parse(constraintPath);
@@ -145,21 +147,18 @@ public final class JsspGaCli {
             List<ConstraintFunction> functions = new ArrayList<>();
             functions.add(interpreter.interpret(dynamicConstraint, instance));
 
-            System.out.println("Accepted dynamic constraint: " + dynamicConstraint.name());
-            System.out.println(
-                    "Acceptance reason: JSON parsed successfully, type is supported, "
-                            + "and required parameters are valid for instance '" + instance.name() + "'."
-            );
+            System.out.println(decisionExplainer.explainAccepted(dynamicConstraint, instance));
 
             return functions;
         } catch (RuntimeException ex) {
-            throw new IllegalArgumentException(
-                    "Dynamic constraint rejected: " + ex.getMessage(),
+            String rejectionExplanation = decisionExplainer.explainRejected(
+                    constraintPath.toString(),
                     ex
             );
+
+            throw new IllegalArgumentException(rejectionExplanation, ex);
         }
     }
-
     private static Map<String, String> parseOptions(String[] args) {
         Map<String, String> options = new HashMap<>();
 

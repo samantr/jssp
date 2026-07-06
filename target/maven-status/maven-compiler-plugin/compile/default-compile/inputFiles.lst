@@ -5,6 +5,7 @@ C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\sr
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\main\java\com\saman\ga\jssp\constraints\ConstraintViolation.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\main\java\com\saman\ga\jssp\constraints\MakespanObjective.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\main\java\com\saman\ga\jssp\dynamic\DynamicConstraint.java
+C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\main\java\com\saman\ga\jssp\dynamic\DynamicConstraintDecisionExplainer.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\main\java\com\saman\ga\jssp\dynamic\DynamicConstraintInterpreter.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\main\java\com\saman\ga\jssp\dynamic\DynamicConstraintParser.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\main\java\com\saman\ga\jssp\dynamic\DynamicConstraintType.java

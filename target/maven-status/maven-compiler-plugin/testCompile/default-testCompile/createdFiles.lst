@@ -9,3 +9,4 @@ com\saman\ga\jssp\explanation\ExplanationServiceTest.class
 com\saman\ga\jssp\dynamic\DynamicConstraintInterpreterTest.class
 com\saman\ga\jssp\parser\JsplibParserTest.class
 com\saman\ga\jssp\constraints\MakespanObjectiveTest.class
+com\saman\ga\jssp\explanation\DynamicConstraintDecisionExplainerTest.class
