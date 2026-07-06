@@ -11,11 +11,20 @@ class GeneticAlgorithmSmokeTest {
     @Test
     void gaReturnsFeasibleSchedule() {
         JsspInstance instance = TestInstances.ft06();
-        GeneticAlgorithmConfig config = new GeneticAlgorithmConfig(30, 20, 0.9, 0.2, 3, 42L);
+
+        GeneticAlgorithmConfig config = new GeneticAlgorithmConfig(
+                30,
+                20,
+                0.9,
+                0.2,
+                3,
+                42L
+        );
 
         GeneticAlgorithmResult result = new GeneticAlgorithm(instance, config).run();
 
-        assertTrue(result.bestMakespan() > 0);
+        assertTrue(result.bestFitness() > 0);
+        assertTrue(result.bestSchedule().makespan() > 0);
         assertTrue(result.bestSchedule().schedulesEveryOperationExactlyOnce(instance));
         assertTrue(result.bestSchedule().respectsPrecedence(instance));
         assertTrue(result.bestSchedule().hasNoMachineConflicts(instance));
