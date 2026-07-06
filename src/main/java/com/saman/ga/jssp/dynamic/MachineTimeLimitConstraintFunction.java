@@ -73,13 +73,18 @@ public final class MachineTimeLimitConstraintFunction implements ConstraintFunct
                 int penalty = excessTime * weight;
                 totalPenalty += penalty;
 
-                violations.add(new ConstraintViolation(
-                        "Operation " + operation.label()
-                                + " on Machine " + machineId
-                                + " ends at time " + operation.endTime()
-                                + ". Allowed latest end time: " + latestEndTime
-                                + ". Penalty added: " + penalty + ".",
-                        penalty
+                String message = "Operation " + operation.label()
+                        + " on Machine " + machineId
+                        + " ends at time " + operation.endTime()
+                        + ". Allowed latest end time: " + latestEndTime
+                        + ". Excess time: " + excessTime
+                        + ". Weight: " + weight
+                        + ". Penalty added: " + penalty + ".";
+
+                violations.add(ConstraintViolation.forOperation(
+                        message,
+                        penalty,
+                        operation
                 ));
             }
         }

@@ -1,11 +1,11 @@
 package com.saman.ga.jssp.cli;
 
-import com.saman.ga.jssp.constraints.ConstraintEvaluation;
 import com.saman.ga.jssp.constraints.ConstraintFunction;
 import com.saman.ga.jssp.dynamic.DynamicConstraint;
 import com.saman.ga.jssp.dynamic.DynamicConstraintInterpreter;
 import com.saman.ga.jssp.dynamic.DynamicConstraintParser;
-import com.saman.ga.jssp.fitness.FitnessCalculator;
+import com.saman.ga.jssp.explanation.ConstraintExplanationReport;
+import com.saman.ga.jssp.explanation.ExplanationService;
 import com.saman.ga.jssp.ga.GeneticAlgorithm;
 import com.saman.ga.jssp.ga.GeneticAlgorithmConfig;
 import com.saman.ga.jssp.ga.GeneticAlgorithmResult;
@@ -92,17 +92,13 @@ public final class JsspGaCli {
 
         long elapsedMillis = (System.nanoTime() - startedAt) / 1_000_000L;
 
-        List<ConstraintEvaluation> dynamicEvaluations = new FitnessCalculator(dynamicConstraintFunctions)
-                .evaluateAll(result.bestSchedule(), instance);
-
-        int dynamicPenalty = dynamicEvaluations.stream()
-                .mapToInt(ConstraintEvaluation::penalty)
-                .sum();
+        ConstraintExplanationReport dynamicReport = new ExplanationService()
+                .explain(result.bestSchedule(), instance, dynamicConstraintFunctions);
 
         System.out.println();
         System.out.println("Best makespan : " + result.bestSchedule().makespan());
         System.out.println("Best fitness : " + result.bestFitness());
-        System.out.println("Dynamic penalty: " + dynamicPenalty);
+        System.out.println("Dynamic penalty: " + dynamicReport.totalPenalty());
         System.out.println("Generation : " + result.generationFound());
         System.out.println("Runtime ms : " + elapsedMillis);
         System.out.println("Precedence OK : " + result.bestSchedule().respectsPrecedence(instance));
@@ -110,18 +106,9 @@ public final class JsspGaCli {
         System.out.println("All ops once : " + result.bestSchedule().schedulesEveryOperationExactlyOnce(instance));
         System.out.println("Best genes : " + result.bestChromosome());
 
-        if (!dynamicEvaluations.isEmpty()) {
+        if (dynamicReport.hasConstraints()) {
             System.out.println();
-            System.out.println("Dynamic constraint evaluations:");
-
-            for (ConstraintEvaluation evaluation : dynamicEvaluations) {
-                System.out.println("----------------------------------------");
-                System.out.println("Constraint : " + evaluation.constraintName());
-                System.out.println("Level : " + evaluation.level());
-                System.out.println("Penalty : " + evaluation.penalty());
-                System.out.println("Violations : " + evaluation.violations().size());
-                System.out.println(evaluation.explanation());
-            }
+            System.out.println(dynamicReport.toText());
         }
 
         if (printSchedule) {
@@ -152,14 +139,25 @@ public final class JsspGaCli {
         DynamicConstraintParser parser = new DynamicConstraintParser();
         DynamicConstraintInterpreter interpreter = new DynamicConstraintInterpreter();
 
-        DynamicConstraint dynamicConstraint = parser.parse(constraintPath);
+        try {
+            DynamicConstraint dynamicConstraint = parser.parse(constraintPath);
 
-        List<ConstraintFunction> functions = new ArrayList<>();
-        functions.add(interpreter.interpret(dynamicConstraint, instance));
+            List<ConstraintFunction> functions = new ArrayList<>();
+            functions.add(interpreter.interpret(dynamicConstraint, instance));
 
-        System.out.println("Accepted dynamic constraint: " + dynamicConstraint.name());
+            System.out.println("Accepted dynamic constraint: " + dynamicConstraint.name());
+            System.out.println(
+                    "Acceptance reason: JSON parsed successfully, type is supported, "
+                            + "and required parameters are valid for instance '" + instance.name() + "'."
+            );
 
-        return functions;
+            return functions;
+        } catch (RuntimeException ex) {
+            throw new IllegalArgumentException(
+                    "Dynamic constraint rejected: " + ex.getMessage(),
+                    ex
+            );
+        }
     }
 
     private static Map<String, String> parseOptions(String[] args) {

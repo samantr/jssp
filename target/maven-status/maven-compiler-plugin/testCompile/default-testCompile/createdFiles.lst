@@ -1,7 +1,11 @@
 com\saman\ga\jssp\ga\MachineConflictTest.class
+com\saman\ga\jssp\dynamic\DynamicConstraintValidationTest.class
 com\saman\ga\jssp\TestInstances.class
 com\saman\ga\jssp\ga\PrecedenceTest.class
+com\saman\ga\jssp\ga\GeneticAlgorithmDynamicConstraintTest.class
 com\saman\ga\jssp\ga\GeneticAlgorithmSmokeTest.class
 com\saman\ga\jssp\ga\ScheduleDecoderTest.class
+com\saman\ga\jssp\explanation\ExplanationServiceTest.class
+com\saman\ga\jssp\dynamic\DynamicConstraintInterpreterTest.class
 com\saman\ga\jssp\parser\JsplibParserTest.class
 com\saman\ga\jssp\constraints\MakespanObjectiveTest.class

@@ -1,4 +1,8 @@
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\constraints\MakespanObjectiveTest.java
+C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\dynamic\DynamicConstraintInterpreterTest.java
+C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\dynamic\DynamicConstraintValidationTest.java
+C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\explanation\ExplanationServiceTest.java
+C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\ga\GeneticAlgorithmDynamicConstraintTest.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\ga\GeneticAlgorithmSmokeTest.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\ga\MachineConflictTest.java
 C:\MyPath\education\Paper\8 - GA Dynamic App\Job Shop Scheduling\jssp-ga-ft06\src\test\java\com\saman\ga\jssp\ga\PrecedenceTest.java
