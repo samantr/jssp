@@ -1,5 +1,6 @@
 package com.saman.ga.jssp.ga;
 
+import com.saman.ga.jssp.constraints.ConstraintFunction;
 import com.saman.ga.jssp.constraints.MakespanObjective;
 import com.saman.ga.jssp.fitness.FitnessCalculator;
 import com.saman.ga.jssp.model.JsspInstance;
@@ -33,6 +34,23 @@ public final class GeneticAlgorithm {
         this.config = Objects.requireNonNull(config, "config");
         this.decoder = new ScheduleDecoder();
         this.fitnessCalculator = new FitnessCalculator(List.of(new MakespanObjective()));
+        this.random = new Random(config.seed());
+    }
+
+    public GeneticAlgorithm(
+            JsspInstance instance,
+            GeneticAlgorithmConfig config,
+            List<ConstraintFunction> constraints
+    ) {
+        this.instance = Objects.requireNonNull(instance, "instance");
+        this.config = Objects.requireNonNull(config, "config");
+        this.decoder = new ScheduleDecoder();
+
+        List<ConstraintFunction> allConstraints = new ArrayList<>();
+        allConstraints.add(new MakespanObjective());
+        allConstraints.addAll(constraints);
+
+        this.fitnessCalculator = new FitnessCalculator(allConstraints);
         this.random = new Random(config.seed());
     }
 
