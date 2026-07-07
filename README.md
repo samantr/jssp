@@ -2,6 +2,33 @@
 
 Minimal Java 17 Maven project for Job Shop Scheduling with a Genetic Algorithm.
 
+## Current prototype status
+
+This repository is a Java research prototype for:
+
+**Dynamic Natural-Language-Generated Fitness Constraints for Genetic Algorithm-Based Job Shop Scheduling**
+
+The current version supports:
+
+- JSPLIB ft06 parsing
+- Operation-based chromosome representation
+- Feasible schedule decoding
+- Genetic Algorithm optimization
+- ConstraintFunction-based fitness calculation
+- Runtime dynamic JSON constraints
+- Dynamic constraint validation
+- Violation explanation reports
+- Accepted/rejected dynamic constraint explanations
+
+Current implemented dynamic constraint type:
+
+- `MACHINE_TIME_LIMIT`
+
+The current fitness formula is:
+
+```text
+fitness = makespan + dynamicPenalty
+
 Current scope:
 
 - JSPLIB parser
