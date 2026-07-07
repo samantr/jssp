@@ -1,10 +1,7 @@
 package com.saman.ga.jssp.cli;
 
 import com.saman.ga.jssp.constraints.ConstraintFunction;
-import com.saman.ga.jssp.dynamic.DynamicConstraint;
-import com.saman.ga.jssp.dynamic.DynamicConstraintDecisionExplainer;
-import com.saman.ga.jssp.dynamic.DynamicConstraintInterpreter;
-import com.saman.ga.jssp.dynamic.DynamicConstraintParser;
+import com.saman.ga.jssp.dynamic.*;
 import com.saman.ga.jssp.explanation.ConstraintExplanationReport;
 import com.saman.ga.jssp.explanation.ExplanationService;
 import com.saman.ga.jssp.ga.GeneticAlgorithm;
@@ -123,41 +120,70 @@ public final class JsspGaCli {
             Map<String, String> options,
             JsspInstance instance
     ) {
+        List<ConstraintFunction> functions = new ArrayList<>();
+
         String constraintOption = options.get("constraint");
-
-        if (constraintOption == null || constraintOption.isBlank()) {
-            return List.of();
-        }
-
-        Path constraintPath = Path.of(constraintOption);
-
-        if (!Files.exists(constraintPath)) {
-            throw new IllegalArgumentException(
-                    "Constraint JSON file not found: " + constraintPath.toAbsolutePath()
-            );
-        }
+        String naturalLanguageOption = options.get("nl");
 
         DynamicConstraintParser parser = new DynamicConstraintParser();
         DynamicConstraintInterpreter interpreter = new DynamicConstraintInterpreter();
         DynamicConstraintDecisionExplainer decisionExplainer = new DynamicConstraintDecisionExplainer();
 
-        try {
-            DynamicConstraint dynamicConstraint = parser.parse(constraintPath);
+        if (constraintOption != null && !constraintOption.isBlank()) {
+            Path constraintPath = Path.of(constraintOption);
 
-            List<ConstraintFunction> functions = new ArrayList<>();
-            functions.add(interpreter.interpret(dynamicConstraint, instance));
+            if (!Files.exists(constraintPath)) {
+                throw new IllegalArgumentException(
+                        "Constraint JSON file not found: " + constraintPath.toAbsolutePath()
+                );
+            }
 
-            System.out.println(decisionExplainer.explainAccepted(dynamicConstraint, instance));
+            try {
+                DynamicConstraint dynamicConstraint = parser.parse(constraintPath);
+                functions.add(interpreter.interpret(dynamicConstraint, instance));
 
-            return functions;
-        } catch (RuntimeException ex) {
-            String rejectionExplanation = decisionExplainer.explainRejected(
-                    constraintPath.toString(),
-                    ex
-            );
+                System.out.println(decisionExplainer.explainAccepted(dynamicConstraint, instance));
+            } catch (RuntimeException ex) {
+                String rejectionExplanation = decisionExplainer.explainRejected(
+                        constraintPath.toString(),
+                        ex
+                );
 
-            throw new IllegalArgumentException(rejectionExplanation, ex);
+                throw new IllegalArgumentException(rejectionExplanation, ex);
+            }
         }
+
+        if (naturalLanguageOption != null && !naturalLanguageOption.isBlank()) {
+            try {
+                DynamicConstraint generatedConstraint = new MockConstraintGenerationAgent()
+                        .generate(naturalLanguageOption, instance);
+
+                functions.add(interpreter.interpret(generatedConstraint, instance));
+
+                System.out.println("Natural language request:");
+                System.out.println(naturalLanguageOption);
+                System.out.println();
+
+                System.out.println("Mock agent generated dynamic constraint:");
+                System.out.println("Name: " + generatedConstraint.name());
+                System.out.println("Type: " + generatedConstraint.type());
+                System.out.println("Level: " + generatedConstraint.level());
+                System.out.println("Weight: " + generatedConstraint.weight());
+                System.out.println("Parameters: " + generatedConstraint.parameters());
+                System.out.println();
+
+                System.out.println(decisionExplainer.explainAccepted(generatedConstraint, instance));
+            } catch (RuntimeException ex) {
+                String rejectionExplanation = decisionExplainer.explainRejected(
+                        naturalLanguageOption,
+                        ex
+                );
+
+                throw new IllegalArgumentException(rejectionExplanation, ex);
+            }
+        }
+
+        return List.copyOf(functions);
     }
     private static Map<String, String> parseOptions(String[] args) {
         Map<String, String> options = new HashMap<>();
@@ -205,6 +231,7 @@ public final class JsspGaCli {
         System.out.println("Options:");
         System.out.println(" --instance  JSPLIB instance path. Default: bundled jsplib/ft06");
         System.out.println(" --constraint  Dynamic constraint JSON path");
+        System.out.println(" --nl  Natural language dynamic constraint request handled by mock agent");
         System.out.println(" --population  Default: 100");
         System.out.println(" --generations  Default: 500");
         System.out.println(" --crossoverRate  Default: 0.9");
