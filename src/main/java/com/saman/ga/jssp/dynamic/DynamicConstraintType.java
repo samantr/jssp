@@ -7,7 +7,8 @@ import java.util.Locale;
 
 public enum DynamicConstraintType {
 
-    MACHINE_TIME_LIMIT;
+    MACHINE_TIME_LIMIT,
+    JOB_FINISH_DEADLINE;
 
     @JsonCreator
     public static DynamicConstraintType fromJson(String value) {

@@ -13,6 +13,13 @@ import java.util.regex.Pattern;
  * First mock implementation of the natural-language constraint generator.
  *
  * This class does not call any external AI API.
+;
+import java.util.regex.Pattern;
+
+/**
+ * First mock implementation of the natural-language constraint generator.
+ *
+ * This class does not call any external AI API.
  * It maps simple English requests into DynamicConstraint objects.
  */
 public final class MockConstraintGenerationAgent implements ConstraintGenerationAgent {
@@ -22,13 +29,28 @@ public final class MockConstraintGenerationAgent implements ConstraintGeneration
             Pattern.CASE_INSENSITIVE
     );
 
+    private static final Pattern JOB_PATTERN = Pattern.compile(
+            "\\bjob\\s+(\\d+)\\b",
+            Pattern.CASE_INSENSITIVE
+    );
+
     private static final Pattern AFTER_TIME_PATTERN = Pattern.compile(
             "\\bafter\\s+(?:time\\s+)?(\\d+)\\b",
             Pattern.CASE_INSENSITIVE
     );
 
+    private static final Pattern BEFORE_TIME_PATTERN = Pattern.compile(
+            "\\bbefore\\s+(?:time\\s+)?(\\d+)\\b",
+            Pattern.CASE_INSENSITIVE
+    );
+
     private static final Pattern LATEST_END_TIME_PATTERN = Pattern.compile(
             "\\b(?:latest\\s+end\\s+time|end\\s+time|time)\\s+(?:is\\s+)?(\\d+)\\b",
+            Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern DEADLINE_PATTERN = Pattern.compile(
+            "\\b(?:deadline|finish\\s+deadline)\\s+(?:is\\s+)?(\\d+)\\b",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -47,6 +69,10 @@ public final class MockConstraintGenerationAgent implements ConstraintGeneration
             return generateMachineTimeLimit(request, instance);
         }
 
+        if (looksLikeJobFinishDeadline(normalized)) {
+            return generateJobFinishDeadline(request, instance);
+        }
+
         throw new IllegalArgumentException(
                 "Mock agent could not map this request to a supported dynamic constraint: "
                         + naturalLanguageRequest
@@ -60,6 +86,15 @@ public final class MockConstraintGenerationAgent implements ConstraintGeneration
                         || normalizedRequest.contains("not work")
                         || normalizedRequest.contains("should not work")
                         || normalizedRequest.contains("latest end")
+        );
+    }
+
+    private boolean looksLikeJobFinishDeadline(String normalizedRequest) {
+        return normalizedRequest.contains("job")
+                && (
+                normalizedRequest.contains("finish before")
+                        || normalizedRequest.contains("should finish before")
+                        || normalizedRequest.contains("deadline")
         );
     }
 
@@ -96,6 +131,39 @@ public final class MockConstraintGenerationAgent implements ConstraintGeneration
         );
     }
 
+    private DynamicConstraint generateJobFinishDeadline(String request, JsspInstance instance) {
+        int jobId = extractRequiredInt(
+                JOB_PATTERN,
+                request,
+                "job id"
+        );
+
+        int deadline = extractDeadline(request);
+
+        if (jobId < 0 || jobId >= instance.numberOfJobs()) {
+            throw new IllegalArgumentException(
+                    "Invalid job id " + jobId
+                            + ". Instance '" + instance.name()
+                            + "' has jobs 0 to " + (instance.numberOfJobs() - 1)
+            );
+        }
+
+        if (deadline < 0) {
+            throw new IllegalArgumentException("Deadline must be non-negative");
+        }
+
+        return new DynamicConstraint(
+                request,
+                DynamicConstraintType.JOB_FINISH_DEADLINE,
+                ConstraintLevel.SOFT,
+                10,
+                Map.of(
+                        "jobId", jobId,
+                        "deadline", deadline
+                )
+        );
+    }
+
     private int extractLatestEndTime(String request) {
         Matcher afterMatcher = AFTER_TIME_PATTERN.matcher(request);
 
@@ -111,6 +179,24 @@ public final class MockConstraintGenerationAgent implements ConstraintGeneration
 
         throw new IllegalArgumentException(
                 "Could not extract latest end time. Example: 'Machine 2 should not work after time 40'"
+        );
+    }
+
+    private int extractDeadline(String request) {
+        Matcher beforeMatcher = BEFORE_TIME_PATTERN.matcher(request);
+
+        if (beforeMatcher.find()) {
+            return Integer.parseInt(beforeMatcher.group(1));
+        }
+
+        Matcher deadlineMatcher = DEADLINE_PATTERN.matcher(request);
+
+        if (deadlineMatcher.find()) {
+            return Integer.parseInt(deadlineMatcher.group(1));
+        }
+
+        throw new IllegalArgumentException(
+                "Could not extract deadline. Example: 'Job 3 should finish before time 45'"
         );
     }
 

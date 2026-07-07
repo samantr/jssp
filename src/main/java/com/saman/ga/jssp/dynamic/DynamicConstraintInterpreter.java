@@ -14,6 +14,7 @@ public final class DynamicConstraintInterpreter {
 
         return switch (constraint.type()) {
             case MACHINE_TIME_LIMIT -> interpretMachineTimeLimit(constraint, instance);
+            case JOB_FINISH_DEADLINE -> interpretJobFinishDeadline(constraint, instance);
         };
     }
 
@@ -50,6 +51,33 @@ public final class DynamicConstraintInterpreter {
                 constraint.weight(),
                 machineId,
                 latestEndTime
+        );
+    }
+
+    private ConstraintFunction interpretJobFinishDeadline(DynamicConstraint constraint, JsspInstance instance) {
+        int jobId = constraint.requiredIntParameter("jobId");
+        int deadline = constraint.requiredIntParameter("deadline");
+
+        if (jobId < 0 || jobId >= instance.numberOfJobs()) {
+            throw new IllegalArgumentException(
+                    "Invalid jobId " + jobId
+                            + " for constraint '" + constraint.name() + "'. Valid range is 0 to "
+                            + (instance.numberOfJobs() - 1)
+            );
+        }
+
+        if (deadline < 0) {
+            throw new IllegalArgumentException(
+                    "deadline must be non-negative for constraint '" + constraint.name() + "'"
+            );
+        }
+
+        return new JobFinishDeadlineConstraintFunction(
+                constraint.name(),
+                constraint.level(),
+                constraint.weight(),
+                jobId,
+                deadline
         );
     }
 }

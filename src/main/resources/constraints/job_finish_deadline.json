@@ -1,0 +1,10 @@
+{
+  "name": "Job 3 should finish before time 45",
+  "type": "JOB_FINISH_DEADLINE",
+  "level": "SOFT",
+  "weight": 10,
+  "parameters": {
+    "jobId": 3,
+    "deadline": 45
+  }
+}
