@@ -20,6 +20,23 @@ The current version supports:
 - Violation explanation reports
 - Accepted/rejected dynamic constraint explanations
 
+## Mock natural-language constraint generation
+
+The project now includes a first mock natural-language constraint generation agent.
+
+This does not call any external AI API.
+
+The current flow is:
+
+```text
+natural language request
+  -> MockConstraintGenerationAgent
+  -> DynamicConstraint
+  -> DynamicConstraintInterpreter
+  -> ConstraintFunction
+  -> GA fitness penalty
+  -> ExplanationService
+  
 Current implemented dynamic constraint type:
 
 - `MACHINE_TIME_LIMIT`
